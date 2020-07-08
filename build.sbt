@@ -4,22 +4,29 @@ ThisBuild / version          := "0.1.0-SNAPSHOT"
 ThisBuild / organization     := "fr.ps.eng"
 ThisBuild / organizationName := "ps-engineering"
 
-lazy val root = (project in file(".")).settings(
+lazy val root = (project in file("."))
+  .settings(
     name := "kafka-application4s",
-    libraryDependencies ++= Dependencies.coreDependencies
-)
+    libraryDependencies ++= Dependencies.rootDependencies
+  )
 
-lazy val clients = (project in file("part1-kafka-clients")).settings(
+lazy val clients = (project in file("part1-kafka-clients"))
+  .dependsOn(root)
+  .settings(
     name := "part1-kafka-clients",
     libraryDependencies ++= Dependencies.kafkaClientsDeps
-)
+  )
 
-lazy val streaming = (project in file("part2-kafka-streams")).settings(
+lazy val streaming = (project in file("part2-kafka-streams"))
+  .dependsOn(root)
+  .settings(
     name := "part2-kafka-streams",
     libraryDependencies ++= Dependencies.kafkaStreamsDeps
-)
+  )
 
-lazy val contrib = (project in file("part3-third-party")).settings(
-  name := "part3-third-party",
-  libraryDependencies ++= Dependencies.kafkaContribDeps
-)
+lazy val contrib = (project in file("part3-third-party"))
+  .dependsOn(root)
+  .settings(
+    name := "part3-third-party",
+    libraryDependencies ++= Dependencies.kafkaContribDeps
+  )

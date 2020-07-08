@@ -2,8 +2,9 @@ import sbt._
 
 object Dependencies {
 
-  lazy val coreDependencies: List[ModuleID] =
-    "org.scalatest" %% "scalatest" % "3.1.1" % Test :: Nil
+  lazy val rootDependencies: List[ModuleID] =
+    "com.github.pureconfig" %% "pureconfig" % "0.13.0" ::
+      "org.scalatest" %% "scalatest" % "3.1.1" % Test :: Nil
 
   lazy val kafkaClientsDeps: List[ModuleID] =
     "org.apache.kafka" % "kafka-clients" % "2.5.0" :: Nil
