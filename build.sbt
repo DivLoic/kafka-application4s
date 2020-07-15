@@ -3,11 +3,14 @@ ThisBuild / scalaVersion     := "2.13.3"
 ThisBuild / version          := "0.1.0-SNAPSHOT"
 ThisBuild / organization     := "fr.ps.eng"
 ThisBuild / organizationName := "ps-engineering"
+ThisBuild / javacOptions     ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
+ThisBuild / scalacOptions    ++= Seq("-language:postfixOps")
 
 lazy val root = (project in file("."))
   .settings(
     name := "kafka-application4s",
-    libraryDependencies ++= Dependencies.rootDependencies
+    libraryDependencies ++= Dependencies.rootDependencies,
+    resolvers += "Confluent Repo" at "http://packages.confluent.io/maven"
   )
 
 lazy val clients = (project in file("part1-kafka-clients"))
