@@ -6,6 +6,11 @@ ThisBuild / organizationName := "ps-engineering"
 ThisBuild / javacOptions     ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
 ThisBuild / scalacOptions    ++= Seq("-language:postfixOps")
 
+lazy val produce: TaskKey[Unit] = taskKey[Unit]("Message Production")
+lazy val consume: TaskKey[Unit] = taskKey[Unit]("Message Consumption")
+lazy val streams: TaskKey[Unit] = taskKey[Unit]("Message Streaming")
+lazy val reactive: TaskKey[Unit] = taskKey[Unit]("Message Production")
+
 lazy val root = (project in file("."))
   .settings(
     name := "kafka-application4s",
@@ -17,7 +22,8 @@ lazy val clients = (project in file("part1-kafka-clients"))
   .dependsOn(root)
   .settings(
     name := "part1-kafka-clients",
-    libraryDependencies ++= Dependencies.kafkaClientsDeps
+    libraryDependencies ++= Dependencies.kafkaClientsDeps,
+    fullRunTask(produce, Compile, s"fr.ps.eng.kafka.app4s.part1.ProducingApp")
   )
 
 lazy val streaming = (project in file("part2-kafka-streams"))
