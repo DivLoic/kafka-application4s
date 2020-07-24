@@ -15,4 +15,10 @@ object Conf {
                                ratingTopicName: String,
                                generatorPeriod: FiniteDuration,
                                generatorParallelismLevel: Int = 1)
+
+  case class ConsumerAppConfig(consumerConfig: Config,
+                               deserializerConfig: Config,
+                               tvShowTopicName: String,
+                               ratingTopicName: String,
+                               pollingTimeout: FiniteDuration)
 }
