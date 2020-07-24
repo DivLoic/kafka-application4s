@@ -70,21 +70,22 @@ object ProducingApp extends App with HelperFunctions with HelperSerdes {
     // (2) captiously send new records
     val generator = new java.util.Timer()
     val tasks: Seq[TimerTask] = (0 until config.generatorParallelismLevel) map { genId =>
+      val userId = s"user-${randomUUID().toString.take(8)}"
       new java.util.TimerTask {
         override def run(): Unit = {
           val rating: Short = Random.nextInt(5).toShort
           val eventTime: Long = Instant.now.toEpochMilli
           val (showKey, showValue) = getRandomTvShow(Dataset.AllTvShows)
-          val genHeader = new RecordHeader("generator-id", s"RATING-GEN($genId)" getBytes)
+          val genHeader = new RecordHeader("generator-id", s"GENERATOR-$genId" getBytes)
           val showHeader =
-            new RecordHeader("show-details", s"Rating for ${showValue name} (on ${showValue platform})" getBytes)
+            new RecordHeader("details", s"Rating for ${showValue name} (on ${showValue platform})" getBytes)
 
           val randomRecord: ProducerRecord[Key, Rating] = new ProducerRecord[Key, Rating](
             config.ratingTopicName,
             null, // let the defaultPartitioner do its job
             eventTime,
             showKey,
-            Rating(randomUUID().toString.take(8), rating),
+            Rating(userId, rating),
             new RecordHeaders(Iterable[Header](genHeader, showHeader) asJava)
           )
 
@@ -94,7 +95,7 @@ object ProducingApp extends App with HelperFunctions with HelperSerdes {
     }
 
     logger info s"Starting the rating generator with ${tasks.length} threads."
-    tasks foreach (generator.schedule(_, randomDelay(), config.generatorPeriod.toMillis))
+    tasks foreach (generator.schedule(_, randomDelay(2 second), randomPeriod(config.generatorPeriod)))
 
     // (3) open, perform and close a transaction
     val producerCallback: Callback = new Callback {
@@ -109,6 +110,19 @@ object ProducingApp extends App with HelperFunctions with HelperSerdes {
 
     producer3.initTransactions()
     var exitFlag: Either[String, Try[_]] = Right(Success())
+
+    sys.addShutdownHook {
+      logger info "Stopping all the generator threads ..."
+      generator.cancel()
+      Try {
+        producer2 :: producer3 :: Nil foreach { producer =>
+          producer.flush()
+          producer.close()
+        }
+      }
+      logger info "Closing the producer app now!"
+    }
+
     while (!exitFlag.swap.contains("exit")) {
       logger info s"Asking for 3 ratings to perform a transaction:"
 
@@ -139,14 +153,6 @@ object ProducingApp extends App with HelperFunctions with HelperSerdes {
         }
     }
 
-    logger info "Stopping all the generator threads ..."
-    generator.cancel()
-    Try {
-      producer2.flush()
-      producer2.close()
-    }
-    logger info "Closing the producer app now!"
-
   }.recover {
     case failures =>
 
@@ -157,7 +163,9 @@ object ProducingApp extends App with HelperFunctions with HelperSerdes {
       sys.exit(-1)
   }
 
-  def randomDelay(): Long = (Math.abs(Random nextGaussian) * 1000L) + (Random.nextDouble() * 100) toLong
+  def randomDelay(max: FiniteDuration): Long = Math.abs(Random.nextLong(max toMillis))
+
+  def randomPeriod(max: FiniteDuration): Long = Math.abs(max toMillis)
 
   def getRandomTvShow(tvShowMap: Map[Key, TvShow]): (Key, TvShow) =
     tvShowMap.toList(Random.nextInt(tvShowMap.size))
