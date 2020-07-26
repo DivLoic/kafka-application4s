@@ -24,7 +24,7 @@ lazy val clients = (project in file("part1-kafka-clients"))
     name := "part1-kafka-clients",
     libraryDependencies ++= Dependencies.kafkaClientsDeps,
     fullRunTask(produce, Compile, s"fr.ps.eng.kafka.app4s.part1.ProducingApp"),
-    fullRunTask(produce, Compile, s"fr.ps.eng.kafka.app4s.part1.ConsumingApp")
+    fullRunTask(consume, Compile, s"fr.ps.eng.kafka.app4s.part1.ConsumingApp")
   )
 
 lazy val streaming = (project in file("part2-kafka-streams"))
