@@ -1,15 +1,24 @@
 package fr.ps.eng.kafka.app4s.client
 
+import cats.instances.map._
+import cats.instances.int._
+import cats.syntax.either._
+import cats.syntax.monoid._
+
 import java.util
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
 
+import fr.ps.eng.kafka.app4s.client.Conf.ConsumerAppConfig
 import fr.ps.eng.kafka.app4s.common._
 import org.apache.kafka.clients.consumer.{ConsumerRebalanceListener, ConsumerRecords, KafkaConsumer}
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.Deserializer
 import org.slf4j.{Logger, LoggerFactory}
 import pureconfig.ConfigSource
+import pureconfig.generic.auto._
 
+import scala.jdk.CollectionConverters._
+import scala.jdk.DurationConverters._
 import scala.util.Try
 
 /**
@@ -52,7 +61,7 @@ object ConsumingApp extends App with HelperFunctions with HelperSerdes {
     logger info s"Just polled the ${records.count()} th TV shows."
     logger warn s"Closing the the first consumer n°1 now!"
     Try(consumer1.close())
-      .recover { case error => logger error("Failed to close the kafka consumer", error) }
+      .recover { case error => logger.error("Failed to close the kafka consumer", error) }
 
     // (2) consuming the latest messages
     val scheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
@@ -81,7 +90,7 @@ object ConsumingApp extends App with HelperFunctions with HelperSerdes {
             .toMap
 
         }.recover { case error =>
-          logger error("something wrong happened", error)
+          logger.error("something wrong happened", error)
           Map.empty[String, Int]
 
         }.foreach { recordMap =>
@@ -93,7 +102,7 @@ object ConsumingApp extends App with HelperFunctions with HelperSerdes {
       println()
       logger warn s"Closing the the first consumer n°2 now!"
       Try(consumer2.close())
-        .recover { case error => logger error("Failed to close the kafka consumer", error) }
+        .recover { case error => logger.error("Failed to close the kafka consumer", error) }
 
     }, 1, TimeUnit.SECONDS)
 

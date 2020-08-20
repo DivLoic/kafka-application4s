@@ -1,10 +1,13 @@
 package fr.ps.eng.kafka.app4s.client
 
+import cats.syntax.either._
+
 import java.time.Instant
 import java.util.TimerTask
 import java.util.UUID.randomUUID
 import java.util.concurrent.Future
 
+import fr.ps.eng.kafka.app4s.client.Conf.ProducerAppConfig
 import fr.ps.eng.kafka.app4s.common._
 import org.apache.kafka.clients.producer.{Callback, KafkaProducer, ProducerRecord, RecordMetadata}
 import org.apache.kafka.common.header.Header
@@ -12,8 +15,10 @@ import org.apache.kafka.common.header.internals.{RecordHeader, RecordHeaders}
 import org.apache.kafka.common.serialization.Serializer
 import org.slf4j.{Logger, LoggerFactory}
 import pureconfig.ConfigSource
+import pureconfig.generic.auto._
 
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration._
+import scala.jdk.CollectionConverters._
 import scala.util.{Random, Success, Try}
 
 /**
