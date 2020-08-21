@@ -1,4 +1,4 @@
-.iead/
+.idea/
 *.iml
 
 dist/*

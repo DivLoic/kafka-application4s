@@ -148,10 +148,11 @@ object ProducingApp extends App with HelperFunctions with HelperSerdes {
 
       exitFlag
         .left
-        .filterToOption(_ == "exit")
+        .filterToOption(_ != "exit")
         .foreach { input =>
           logger warn s"$input was unexpected: type [0-5] or 'pass' or 'exit'."
         }
+
     }
 
   }.recover {

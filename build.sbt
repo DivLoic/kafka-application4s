@@ -13,8 +13,8 @@ lazy val consume: TaskKey[Unit] = taskKey[Unit]("Message Consumption")
 lazy val root = (project in file("."))
   .settings(
     name := "kafka-application4s",
-    resolvers += "Confluent Repo" at "http://packages.confluent.io/maven",
+    resolvers += "Confluent Repo" at "https://packages.confluent.io/maven",
     libraryDependencies ++= (Dependencies.rootDependencies ++ Dependencies.kafkaClientsDeps),
-    fullRunTask(produce, Compile, s"fr.ps.eng.kafka.app4s.part1.ProducingApp"),
-    fullRunTask(consume, Compile, s"fr.ps.eng.kafka.app4s.part1.ConsumingApp")
+    fullRunTask(produce, Compile, s"fr.ps.eng.kafka.app4s.client.ProducingApp"),
+    fullRunTask(consume, Compile, s"fr.ps.eng.kafka.app4s.client.ConsumingApp")
   )

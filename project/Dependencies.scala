@@ -11,5 +11,5 @@ object Dependencies {
                                               "org.scalatest" %% "scalatest" % "3.1.1" % Test :: Nil
 
   lazy val kafkaClientsDeps: List[ModuleID] = "org.apache.kafka" % "kafka-clients" % "2.6.0" ::
-                                              "io.confluent" % "kafka-streams-avro-serde" % "5.5.1" ::Nil
+                                              "io.confluent" % "kafka-avro-serializer" % "6.0.0" ::Nil
 }
