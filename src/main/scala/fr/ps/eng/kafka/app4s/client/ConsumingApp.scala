@@ -41,10 +41,10 @@ object ConsumingApp extends App with HelperFunctions with HelperSerdes {
 
     val baseConfig: Map[String, AnyRef] = config.consumerConfig.toMap
 
-    val consumerConfig1 = baseConfig ++ Map("group.id" -> "groupe1", "fetch.max.bytes" -> "50") asJava
+    val consumerConfig1 = baseConfig ++ Map("group.id" -> "group1", "fetch.max.bytes" -> "50") asJava
     val consumer1 = new KafkaConsumer[Key, TvShow](consumerConfig1, keyDeserializer, tvShowDeserializer)
 
-    val consumerConfig2 = baseConfig ++ Map("group.id" -> "groupe2", "enable.auto.commit" -> "true") asJava
+    val consumerConfig2 = baseConfig ++ Map("group.id" -> "group2", "enable.auto.commit" -> "true") asJava
 
     // (1) backtracking from the beginning
     val tvShowPartition: Vector[TopicPartition] = consumer1

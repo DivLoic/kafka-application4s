@@ -14,3 +14,5 @@ project/plugins/project/
 *.class
 *.log
 .desktop/
+
+.bsp/
