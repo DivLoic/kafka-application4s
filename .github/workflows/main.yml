@@ -10,12 +10,12 @@ jobs:
     name: Master Workflow Job
     runs-on: ubuntu-latest
 
-steps:
-  - name: Checkout Produce/Consume Scala example
-    uses: actions/checkout@v1
+    steps:
+      - name: Checkout Produce/Consume Scala example
+        uses: actions/checkout@v1
 
-  - name:
-    run:  sdk install sbt
+      - name: Install SBT
+        run:  sdk install sbt
 
-  - name: Sbt Unit Tests
-    run: sbt test
+      - name: SBT Unit Tests
+        run: sbt test
