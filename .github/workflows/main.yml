@@ -14,8 +14,11 @@ jobs:
       - name: Checkout Produce/Consume Scala example
         uses: actions/checkout@v1
 
+      - name: Install SDKMAN
+        run: curl -s "https://get.sdkman.io" | bash
+
       - name: Install SBT
-        run:  sdk install sbt
+        run:  source "$HOME/.sdkman/bin/sdkman-init.sh" && sdk install sbt
 
       - name: SBT Unit Tests
         run: sbt test
