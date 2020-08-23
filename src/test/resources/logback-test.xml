@@ -1,0 +1,17 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%-6relative %-5level %logger {35} - %msg \n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="fr.ps.eng" level="${APP_LOG_LVL:-INFO}" additivity="false">
+        <appender-ref ref="console"/>
+    </logger>
+
+    <root level="${TEST_LOG_LVL:-ERROR}">
+        <appender-ref ref="console"/>
+    </root>
+
+</configuration>

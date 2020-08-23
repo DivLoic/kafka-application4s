@@ -17,7 +17,8 @@ trait HelperSerdes {
     def reflectionAvroSerializer4S[T: RecordFormat]: Serializer[T] = new Serializer[T] {
       val inner = new KafkaAvroSerializer()
 
-      override def configure(configs: java.util.Map[String, _], isKey: Boolean): Unit = inner.configure(configs, isKey)
+      override def configure(configs: java.util.Map[String, _], isKey: Boolean): Unit =
+        inner.configure(configs, isKey)
 
       override def serialize(topic: String, maybeData: T): Array[Byte] = Option(maybeData)
         .map(data => inner.serialize(topic, implicitly[RecordFormat[T]].to(data)))
@@ -29,11 +30,15 @@ trait HelperSerdes {
     def reflectionAvroDeserializer4S[T: RecordFormat]: Deserializer[T] = new Deserializer[T] {
       val inner = new KafkaAvroDeserializer()
 
-      override def configure(configs: java.util.Map[String, _], isKey: Boolean): Unit = inner.configure(configs, isKey)
+      override def configure(configs: java.util.Map[String, _], isKey: Boolean): Unit =
+        inner.configure(configs, isKey)
 
       override def deserialize(topic: String, maybeData: Array[Byte]): T = Option(maybeData)
         .filter(_.nonEmpty)
-        .map(data => implicitly[RecordFormat[T]].from(inner.deserialize(topic, data).asInstanceOf[IndexedRecord]))
+        .map { data =>
+          implicitly[RecordFormat[T]]
+            .from(inner.deserialize(topic, data).asInstanceOf[IndexedRecord])
+        }
         .getOrElse(null.asInstanceOf[T])
 
       override def close(): Unit = inner.close()

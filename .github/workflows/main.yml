@@ -20,5 +20,8 @@ jobs:
       - name: Install SBT
         run:  source "$HOME/.sdkman/bin/sdkman-init.sh" && sdk install sbt
 
-      - name: SBT Unit Tests
+      - name: Compile project
+        run: sbt compile
+
+      - name: Run test
         run: sbt test
