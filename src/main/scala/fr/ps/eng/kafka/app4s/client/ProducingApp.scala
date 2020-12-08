@@ -32,34 +32,34 @@ object ProducingApp extends App with HelperFunctions with HelperSerdes {
 
   ConfigSource.file(configFile).load[ProducerAppConfig].map { config =>
     // (0) configure serializers and producers
-    val keySerializer: Serializer[Key] = reflectionAvroSerializer4S[Key]
-    val tvShowSerializer: Serializer[TvShow] = reflectionAvroSerializer4S[TvShow]
-    val ratingSerializer: Serializer[Rating] = reflectionAvroSerializer4S[Rating]
+    // TODO: use reflectionAvroSerializer4S to create the following serializers
+    val keySerializer: Serializer[Key] = ???
+    val tvShowSerializer: Serializer[TvShow] = ???
+    val ratingSerializer: Serializer[Rating] = ???
 
     keySerializer.configure(config.serializerConfig.toMap.asJava, true)
-    tvShowSerializer :: ratingSerializer :: Nil foreach (_.configure(config.serializerConfig.toMap.asJava, false))
+    // TODO: call Serializer#configure on the other serializers
 
     val baseConfig: Map[String, AnyRef] = config.producerConfig.toMap
 
     val producerConfig1 = baseConfig ++ Map("client.id" -> "client1", "linger.ms" -> s"${(1 minute) toMillis}") asJava
-    val producer1 = new KafkaProducer[Key, TvShow](producerConfig1, keySerializer, tvShowSerializer)
-
     val producerConfig2 = baseConfig ++ Map("client.id" -> "client2", "retries" -> "0") asJava
-    val producer2 = new KafkaProducer[Key, Rating](producerConfig2, keySerializer, ratingSerializer)
-
     val producerConfig3 = baseConfig ++ Map("client.id" -> "client3", "transactional.id" -> "client3") asJava
-    val producer3 = new KafkaProducer[Key, Rating](producerConfig3, keySerializer, ratingSerializer)
+
+    // TODO: for each producerConfig(N) create an instance of KafkaProducer named producer(N)
+    val producer1: KafkaProducer[Key, TvShow] = ???
+    val producer2: KafkaProducer[Key, Rating] = ???
+    val producer3: KafkaProducer[Key, Rating] = ???
 
     // (1) batching the complete tv show collection
     logger info "Batching the tv show referential dataset now ..."
-    val _: Vector[Future[RecordMetadata]] = Dataset.AllTvShows.toVector.map { case (showKey, showValue) =>
-      val record = new ProducerRecord[Key, TvShow](config.tvShowTopicName, showKey, showValue)
-      producer1 send record
+    // TODO: for each element from Dataset.AllTvShows create a ProducerRecord and send it to kafka
+    Dataset.AllTvShows.foreach { show =>
+      // new ProducerRecord
     }
 
     Try {
-      producer1.flush()
-      producer1.close()
+      // TODO: use Producer#flush OR Producer#close to confirm
       logger info "Successfully produce the complete TV show collection."
       logger info s"${Dataset.AllTvShows size} TV shows from the " +
         "Netflix, Hulu and Disney+'s catalogs are available to consumers."
@@ -90,7 +90,7 @@ object ProducingApp extends App with HelperFunctions with HelperSerdes {
             new RecordHeaders(Iterable[Header](genHeader, showHeader) asJava)
           )
 
-          producer2 send randomRecord
+          // TODO: use Producer#send to 
         }
       }
     }
@@ -100,13 +100,9 @@ object ProducingApp extends App with HelperFunctions with HelperSerdes {
 
     // (3) open, perform and close a transaction
     val producerCallback: Callback = new Callback {
-      override def onCompletion(metadata: RecordMetadata, exception: Exception): Unit = Option(exception)
-
-        .map(error => logger.error("fail to produce a record due to: ", error))
-
-        .getOrElse(logger info s"Successfully produce a new record to kafka: ${
-          s"topic: ${metadata.topic()}, partition: ${metadata.partition()}, offset: ${metadata.offset()}"
-        }")
+      override def onCompletion(metadata: RecordMetadata, exception: Exception): Unit = {
+        // TODO: check if exception is null otherwise process the metadata
+      }
     }
 
     producer3.initTransactions()
@@ -117,8 +113,7 @@ object ProducingApp extends App with HelperFunctions with HelperSerdes {
       generator.cancel()
       Try {
         producer2 :: producer3 :: Nil foreach { producer =>
-          producer.flush()
-          producer.close()
+          // TODO: in this shutdown hook close the producers 2 & 3
         }
       }
       logger info "Closing the producer app now!"
@@ -133,11 +128,11 @@ object ProducingApp extends App with HelperFunctions with HelperSerdes {
         record3 <- getConsoleRating(config)
       } yield {
         Try {
-          producer3.beginTransaction()
-          producer3.send(record1, producerCallback)
-          producer3.send(record2, producerCallback)
-          producer3.send(record3, producerCallback)
-          producer3.commitTransaction()
+          // TODO: begin transaction
+          // TODO: send record 1
+          // TODO: send record 2
+          // TODO: send record 3
+          // TODO: commit transaction
           logger info "A transaction of 3 records has been completed."
         }.recover {
           case _ =>

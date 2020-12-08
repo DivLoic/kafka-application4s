@@ -32,19 +32,21 @@ object ConsumingApp extends App with HelperFunctions with HelperSerdes {
 
   ConfigSource.file(configFile).load[ConsumerAppConfig].map { config =>
     // (0) configure serializers and producers
-    val keyDeserializer: Deserializer[Key] = reflectionAvroDeserializer4S[Key]
-    val tvShowDeserializer: Deserializer[TvShow] = reflectionAvroDeserializer4S[TvShow]
-    val ratingDeserializer: Deserializer[Rating] = reflectionAvroDeserializer4S[Rating]
+    // TODO: use reflectionAvroDeserializer4S to create the following serializers
+    val keyDeserializer: Deserializer[Key] = ???
+    val tvShowDeserializer: Deserializer[TvShow] = ???
+    val ratingDeserializer: Deserializer[Rating] = ???
 
     keyDeserializer.configure(config.deserializerConfig.toMap.asJava, true)
-    tvShowDeserializer :: ratingDeserializer :: Nil foreach (_.configure(config.deserializerConfig.toMap.asJava, false))
+    // TODO: call Serializer#configure on the other serializers
 
     val baseConfig: Map[String, AnyRef] = config.consumerConfig.toMap
 
     val consumerConfig1 = baseConfig ++ Map("group.id" -> "group1", "fetch.max.bytes" -> "50") asJava
-    val consumer1 = new KafkaConsumer[Key, TvShow](consumerConfig1, keyDeserializer, tvShowDeserializer)
-
     val consumerConfig2 = baseConfig ++ Map("group.id" -> "group2", "enable.auto.commit" -> "true") asJava
+
+    // TODO: create an instance of KafkaConsumer named consumer1 based on consumerConfig1
+    val consumer1: KafkaConsumer[Key, TvShow] = ???
 
     // (1) backtracking from the beginning
     val tvShowPartition: Vector[TopicPartition] = consumer1
@@ -53,8 +55,8 @@ object ConsumingApp extends App with HelperFunctions with HelperSerdes {
       .toVector
       .map(info => new TopicPartition(info.topic(), info.partition()))
 
-    consumer1.assign(tvShowPartition asJava)
-    consumer1.seekToBeginning(consumer1.assignment())
+    // TODO: Assign consumer1 to the partitions contained in tvShowPartition
+    // TODO: Set consumer1 to the beginning of the partitions contained in tvShowPartition
 
     val records: ConsumerRecords[Key, TvShow] = consumer1.poll(config.pollingTimeout.toJava)
 
@@ -67,21 +69,17 @@ object ConsumingApp extends App with HelperFunctions with HelperSerdes {
     val scheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
     scheduler.schedule(() => {
       var map = Map.empty[String, Int]
-      val listener = new ConsumerRebalanceListener {
-        override def onPartitionsRevoked(partitions: util.Collection[TopicPartition]): Unit =
-          logger info s"The following partition are revoked: ${partitions.asScala.mkString(", ")}"
-
-        override def onPartitionsAssigned(partitions: util.Collection[TopicPartition]): Unit =
-          logger info s"The following partition are assigned: ${partitions.asScala.mkString(", ")}"
-      }
+      // TODO: create a new ConsumerRebalanceListener
+      val listener: ConsumerRebalanceListener = ???
 
       val consumer2 = new KafkaConsumer[Key, Rating](consumerConfig2, keyDeserializer, ratingDeserializer)
-      consumer2.subscribe(config.ratingTopicName :: Nil asJava, listener)
+      // TODO: subscribe consumer2 to config.ratingTopicName
 
       while (!scheduler.isShutdown) {
         Thread.sleep(2000)
         Try {
-          val records = consumer2.poll(config.pollingTimeout.toJava)
+          // TODO: use consumer2 to poll records (hint: use config.pollingTimeout)
+          val records: ConsumerRecords[Key, Rating] = ???
           records.iterator().asScala.toVector
         }.map {
           _.groupBy(_.value().user)
@@ -101,8 +99,7 @@ object ConsumingApp extends App with HelperFunctions with HelperSerdes {
 
       println()
       logger warn s"Closing the the first consumer n°2 now!"
-      Try(consumer2.close())
-        .recover { case error => logger.error("Failed to close the kafka consumer", error) }
+      // TODO: close consumer2
 
     }, 1, TimeUnit.SECONDS)
 
