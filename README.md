@@ -3,7 +3,7 @@
 ![Master Workflow](https://github.com/DivLoic/kafka-application4s/workflows/Master%20Workflow/badge.svg)
 
 This module is the attached source code from the blog post 
-[Getting Started with Scala and Apache Kafka](#).
+[Getting Started with Scala and Apache Kafka](https://www.confluent.io/blog/kafka-scala-tutorial-for-beginners/).
 It discusses how to use the basic Kafka Clients in a Scala application. 
 Originally inpired by the first
 [scala example](https://github.com/confluentinc/examples/tree/6.0.0-post/clients/cloud/scala),
@@ -72,5 +72,5 @@ sbt consume "-Djline.terminal=none" --error
 [![asciicast](https://asciinema.org/a/DjI20wqNnU470hcXkb0uKpe2C.svg)](https://asciinema.org/a/DjI20wqNnU470hcXkb0uKpe2C)
 
 ## Read more
-- The code is detail in the [blog post](#)
-- For a step by step approach including tests checkout this [Kafka Tutorial](#)  
+- The code is detail in the [blog post](https://www.confluent.io/blog/kafka-scala-tutorial-for-beginners/)
+- For a step by step approach including tests checkout this [Kafka Tutorial](https://kafka-tutorials.confluent.io/produce-consume-lang/scala.html)  
