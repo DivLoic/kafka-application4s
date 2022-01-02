@@ -33,7 +33,7 @@ i.e. Confluent Cli on Mac
 curl -sL https://cnfl.io/cli | sh -s -- latest -b /usr/local/bin
 export CONFLUENT_HOME=...
 export PATH=$PATH:$CONFLUENT_HOME
-confluent local services start schema-registry
+confluent local services schema-registry start
 ```
  
 
